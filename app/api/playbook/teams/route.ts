@@ -55,11 +55,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Rate limiting
-    const rateLimiter = createRateLimiter(10, "1 m"); // 10 requests per minute
-    const { success } = await rateLimiter.limit(user.id);
-    if (!success) {
-      return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+    // Rate limiting (skip if Redis unavailable)
+    try {
+      const rateLimiter = createRateLimiter(10, "1 m"); // 10 requests per minute
+      const { success } = await rateLimiter.limit(user.id);
+      if (!success) {
+        return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+      }
+    } catch (rateLimitError) {
+      // Log but don't fail if Redis is unavailable
+      console.warn("Rate limiting unavailable:", rateLimitError);
     }
 
     const body = await request.json();
