@@ -45,6 +45,8 @@ export function Navbar({ profile, subscription }: NavbarProps) {
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/viewer">Viewer</NavLink>
             <NavLink href="/assets">Assets</NavLink>
+            <NavLink href="/playbook">Playbook</NavLink>
+            <NavLink href="/learn">Learn</NavLink>
             <NavLink href="/settings">Settings</NavLink>
             {profile.is_admin && <NavLink href="/admin">Admin</NavLink>}
           </div>
@@ -101,6 +103,8 @@ export function Navbar({ profile, subscription }: NavbarProps) {
           <MobileNavLink href="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</MobileNavLink>
           <MobileNavLink href="/viewer" onClick={() => setMenuOpen(false)}>Viewer</MobileNavLink>
           <MobileNavLink href="/assets" onClick={() => setMenuOpen(false)}>Assets</MobileNavLink>
+          <MobileNavLink href="/playbook" onClick={() => setMenuOpen(false)}>Playbook</MobileNavLink>
+          <MobileNavLink href="/learn" onClick={() => setMenuOpen(false)}>Learn</MobileNavLink>
           <MobileNavLink href="/settings" onClick={() => setMenuOpen(false)}>Settings</MobileNavLink>
           {profile.is_admin && (
             <MobileNavLink href="/admin" onClick={() => setMenuOpen(false)}>Admin</MobileNavLink>
