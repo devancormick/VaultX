@@ -3,58 +3,68 @@
 import { useEffect, useState } from "react";
 import { Tour } from "@/components/ui/tour";
 
-const tourSteps = [
+const BASE_STEPS = [
   {
-    target: "nav [href='/dashboard']",
-    title: "Welcome to VaultX!",
-    content: "This is your dashboard - your central hub for managing assets, viewing activity, and accessing all features.",
+    target: ".subscription-card",
+    title: "Your Plan",
+    content: "This shows your current subscription. Upgrade to Pro or Enterprise to unlock the Playbook platform and 3D viewer.",
     position: "bottom" as const,
   },
   {
     target: "nav [href='/viewer']",
-    title: "Viewer",
-    content: "Use the Viewer to securely share and access your assets. It's perfect for presentations and collaborations.",
+    title: "3D Football Viewer",
+    content: "Watch your plays animated on a real 3D football field. Player routes animate in real time — orbit and zoom with your mouse.",
     position: "bottom" as const,
   },
   {
     target: "nav [href='/assets']",
     title: "Assets",
-    content: "Manage all your uploaded files and documents here. Organize, search, and control access to your content.",
+    content: "Upload and manage files like playbooks, game film, or scouting reports for your team.",
     position: "bottom" as const,
   },
+];
+
+const COACH_STEPS = [
   {
     target: "nav [href='/playbook']",
-    title: "Playbook",
-    content: "Create and manage your sports teams, strategies, and plays. This is where coaches build their game plans.",
+    title: "Playbook — Coach Center",
+    content: "Start here. Create a team, build playbooks, design plays on the canvas, and invite your players.",
     position: "bottom" as const,
-  },
-  {
-    target: "nav [href='/learn']",
-    title: "Learn",
-    content: "Access training materials and resources. Players can review plays and improve their skills.",
-    position: "bottom" as const,
-  },
-  {
-    target: ".subscription-card",
-    title: "Your Subscription",
-    content: "Track your plan status and manage billing here. Upgrade for more features and storage.",
-    position: "top" as const,
   },
   {
     target: ".quick-actions",
     title: "Quick Actions",
-    content: "These buttons give you fast access to the most common tasks. Start by opening the Viewer or browsing your assets.",
+    content: "Create a team first — it takes 30 seconds. Then build a playbook, draw your first play, and invite a player to drill it.",
     position: "top" as const,
   },
 ];
 
-export function DashboardTour() {
+const PLAYER_STEPS = [
+  {
+    target: "nav [href='/learn']",
+    title: "Learn — Your Drill Hub",
+    content: "This is where you master your playbook. Every play goes through 4 phases: Study → Identify → Execute → Game Ready.",
+    position: "bottom" as const,
+  },
+  {
+    target: ".quick-actions",
+    title: "Start Drilling",
+    content: "Earn XP, build streaks, and climb the team leaderboard. The smarter you drill, the less often plays come back for review.",
+    position: "top" as const,
+  },
+];
+
+interface DashboardTourProps {
+  isCoach?: boolean;
+  isPlayer?: boolean;
+}
+
+export function DashboardTour({ isCoach = false, isPlayer = false }: DashboardTourProps) {
   const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     const completed = localStorage.getItem("tour_completed");
     if (!completed) {
-      // Small delay to ensure DOM is ready
       const timer = setTimeout(() => setShowTour(true), 1000);
       return () => clearTimeout(timer);
     }
@@ -62,9 +72,12 @@ export function DashboardTour() {
 
   if (!showTour) return null;
 
+  const roleSteps = isCoach ? COACH_STEPS : isPlayer ? PLAYER_STEPS : [];
+  const steps = [...BASE_STEPS, ...roleSteps];
+
   return (
     <Tour
-      steps={tourSteps}
+      steps={steps}
       onComplete={() => setShowTour(false)}
     />
   );

@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name } = createTeamSchema.parse(body);
 
-    // Check subscription
+    // Resolve plan — default to "free" if no active subscription row exists
     const { data: subscriptions } = await supabase
       .from("subscriptions")
       .select("plan, status")
@@ -79,39 +79,16 @@ export async function POST(request: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(1);
 
-    const subscription = subscriptions?.[0];
+    const planName = subscriptions?.[0]?.plan ?? "free";
 
-    if (!subscription) {
-      return NextResponse.json({ error: "No valid subscription found" }, { status: 403 });
-    }
-
-    // Allow Pro and Enterprise plans to access playbook
-    const allowedPlans = ["pro", "professional", "enterprise"];
-    const hasPlaybookAccess = allowedPlans.includes(subscription.plan.toLowerCase());
-
-    if (!hasPlaybookAccess) {
-      const { data: planLimits } = await supabase
-        .from("plan_limits")
-        .select("playbook_access")
-        .eq("plan", subscription.plan)
-        .single();
-
-      if (!planLimits?.playbook_access) {
-        return NextResponse.json(
-          { error: "Playbook access requires Pro or Enterprise plan", code: "plan_upgrade_required" },
-          { status: 403 }
-        );
-      }
-    }
-
-    // Get plan limits for team count check
+    // Get plan limits
     const { data: planLimits } = await supabase
       .from("plan_limits")
       .select("max_teams")
-      .eq("plan", subscription.plan)
+      .eq("plan", planName)
       .single();
 
-    const maxTeams = planLimits?.max_teams ?? (allowedPlans.includes(subscription.plan.toLowerCase()) ? 5 : 1);
+    const maxTeams = planLimits?.max_teams ?? 1;
 
     // Check team count
     const { count } = await supabase
@@ -121,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     if (count !== null && count >= maxTeams) {
       return NextResponse.json(
-        { error: `Team limit reached (${maxTeams} max for ${subscription.plan} plan)` },
+        { error: `Team limit reached (${maxTeams} max for ${planName} plan)` },
         { status: 403 }
       );
     }

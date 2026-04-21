@@ -4,13 +4,25 @@ import "../instrumentation";
 import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
-  title: "VaultX — Secure access. Protected assets. Zero compromise.",
+  title: {
+    default: "VaultX",
+    template: "%s · VaultX",
+  },
   description:
-    "VaultX is a production-grade SaaS platform delivering gated browser-based 3D experiences with enterprise-level backend security, real Stripe billing, and complete user management.",
+    "VaultX — 3D asset delivery, football playbook platform, and team management. Built for coaches and athletes who demand more.",
+  applicationName: "VaultX",
+  keywords: ["football playbook", "3D viewer", "team management", "play design", "coaching platform"],
+  authors: [{ name: "VaultX" }],
   openGraph: {
     title: "VaultX",
-    description: "Secure access. Protected assets. Zero compromise.",
+    description: "3D asset delivery and football playbook platform for coaches and athletes.",
     type: "website",
+    siteName: "VaultX",
+  },
+  twitter: {
+    card: "summary",
+    title: "VaultX",
+    description: "3D asset delivery and football playbook platform for coaches and athletes.",
   },
 };
 

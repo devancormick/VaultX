@@ -21,12 +21,16 @@ export default async function DashboardPage() {
     { data: auditLogs },
     { count: assetCount },
     { count: sessionCount },
+    { data: coachTeams },
+    { data: playerMemberships },
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single(),
     supabase.from("audit_log").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10),
     supabase.from("assets").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     supabase.from("viewer_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("revoked", false).gt("expires_at", new Date().toISOString()),
+    supabase.from("teams").select("id").eq("coach_id", user.id).limit(1),
+    supabase.from("team_memberships").select("id").eq("player_id", user.id).eq("status", "active").limit(1),
   ]);
 
   const sub = subscription as Subscription | null;
@@ -134,7 +138,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <DashboardTour />
+      <DashboardTour isCoach={!!(coachTeams && coachTeams.length > 0)} isPlayer={!!(playerMemberships && playerMemberships.length > 0)} />
     </div>
   );
 }
