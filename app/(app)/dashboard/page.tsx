@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatRelativeTime, maskIpAddress } from "@/lib/utils";
 import type { AuditLog, Subscription } from "@/lib/supabase/types";
+import { DashboardTour } from "./tour";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Subscription card */}
-      <Card className={plan !== "free" ? "border-accent/30" : ""}>
+      <Card className={`subscription-card ${plan !== "free" ? "border-accent/30" : ""}`}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Subscription</CardTitle>
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div>
+      <div className="quick-actions">
         <h2 className="font-display font-extrabold text-lg text-text mb-4">Quick actions</h2>
         <div className="flex flex-wrap gap-3">
           <Link href="/viewer">
@@ -132,6 +133,8 @@ export default async function DashboardPage() {
           )}
         </Card>
       </div>
+
+      <DashboardTour />
     </div>
   );
 }
