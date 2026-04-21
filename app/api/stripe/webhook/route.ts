@@ -41,12 +41,13 @@ async function handleSubscriptionUpsert(
   const priceId = planItem?.price?.id ?? null;
 
   let plan: "free" | "pro" | "enterprise" = "free";
-  if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID) plan = "pro";
-  else if (priceId === process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID) plan = "enterprise";
+  if (priceId && priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID) plan = "pro";
+  else if (priceId && priceId === process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID) plan = "enterprise";
+  else if (priceId) console.warn("[webhook] unknown priceId:", priceId, "— defaulting to free");
 
   const status = sub.status as "active" | "canceled" | "past_due" | "trialing" | "incomplete" | "unpaid";
 
-  await supabase.from("subscriptions").upsert({
+  const { error: upsertError } = await supabase.from("subscriptions").upsert({
     id: sub.id,
     user_id: profile.id,
     stripe_customer_id: customerId,
@@ -62,6 +63,11 @@ async function handleSubscriptionUpsert(
     trial_end: (sub as any).trial_end ? new Date((sub as any).trial_end * 1000).toISOString() : null,
     updated_at: new Date().toISOString(),
   });
+
+  if (upsertError) {
+    console.error("[webhook] subscriptions upsert failed:", upsertError);
+    throw new Error(`Subscription upsert failed: ${upsertError.message}`);
+  }
 
   await supabase.from("audit_log").insert({
     user_id: profile.id,
@@ -161,7 +167,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ received: true });
-  } catch {
+  } catch (err) {
+    console.error("[webhook] handler error:", err);
     return NextResponse.json({ received: true });
   }
 }

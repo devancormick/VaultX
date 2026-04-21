@@ -31,7 +31,8 @@ function SuccessContent() {
         .from("subscriptions")
         .select("plan, status")
         .eq("user_id", user.id)
-        .eq("status", "active")
+        .in("status", ["active", "trialing"])
+        .limit(1)
         .single();
       if (sub) {
         clearInterval(intervalRef.current!);
