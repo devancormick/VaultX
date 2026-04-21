@@ -47,6 +47,10 @@ export const migrationBatchSchema = z.object({
   users: z.array(migrationUserSchema).min(1).max(500),
 });
 
+export const createTeamSchema = z.object({
+  name: z.string().min(1, "Team name is required").max(100, "Team name too long"),
+});
+
 export const notificationPrefsSchema = z.object({
   billing: z.boolean(),
   access: z.boolean(),
