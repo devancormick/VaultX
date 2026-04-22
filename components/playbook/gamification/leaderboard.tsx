@@ -12,8 +12,8 @@ export async function Leaderboard({ teamId, currentUserId }: { teamId: string; c
       player_id,
       position,
       profiles!inner(full_name, email, avatar_url),
-      player_xp(total_xp, level),
-      player_streaks(current_streak)
+      player_xp!inner(total_xp, level),
+      player_streaks!inner(current_streak)
     `)
     .eq("team_id", teamId)
     .eq("status", "active")
@@ -27,10 +27,10 @@ export async function Leaderboard({ teamId, currentUserId }: { teamId: string; c
   return (
     <div className="space-y-1">
       {rows.map((row, idx) => {
-        const xp = (row.player_xp as { total_xp: number } | null)?.total_xp ?? 0;
-        const streak = (row.player_streaks as { current_streak: number } | null)?.current_streak ?? 0;
+        const xp = (row.player_xp as unknown as { total_xp: number } | null)?.total_xp ?? 0;
+        const streak = (row.player_streaks as unknown as { current_streak: number } | null)?.current_streak ?? 0;
         const level = getLevelForXp(xp);
-        const profile = row.profiles as { full_name: string; email: string; avatar_url?: string };
+        const profile = row.profiles as unknown as { full_name: string; email: string; avatar_url?: string };
         const isMe = row.player_id === currentUserId;
         const rank = idx + 1;
 

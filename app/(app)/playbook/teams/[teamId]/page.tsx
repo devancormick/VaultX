@@ -25,7 +25,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
   const [{ data: rawMembers }, { data: rawPlaybooks }] = await Promise.all([
     supabase
       .from("team_memberships")
-      .select("id, player_id, position, jersey_number, status, profiles(full_name, email, avatar_url)")
+      .select("id, player_id, position, jersey_number, status, profiles!inner(full_name, email, avatar_url)")
       .eq("team_id", teamId),
     supabase
       .from("playbooks")
@@ -34,7 +34,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
       .order("created_at", { ascending: false }),
   ]);
 
-  const members = (rawMembers ?? []) as Array<{
+  const members = (rawMembers ?? []) as unknown as Array<{
     id: string;
     player_id: string;
     position: string | null;
