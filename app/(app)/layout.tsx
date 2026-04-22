@@ -11,7 +11,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const [{ data: profile }, { data: subscriptions }, { data: teams }, { data: memberships }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
-    supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
+    supabase.from("subscriptions").select("*").eq("user_id", user.id).in("status", ["active", "trialing"]).order("created_at", { ascending: false }).limit(1),
     supabase.from("teams").select("id").eq("coach_id", user.id).limit(1),
     supabase.from("team_memberships").select("id").eq("player_id", user.id).eq("status", "active").limit(1),
   ]);

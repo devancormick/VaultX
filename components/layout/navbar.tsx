@@ -13,9 +13,11 @@ import type { Profile, Subscription } from "@/lib/supabase/types";
 interface NavbarProps {
   profile?: Profile | null;
   subscription?: Subscription | null;
+  hasCoachAccess?: boolean;
+  hasPlayerAccess?: boolean;
 }
 
-export function Navbar({ profile, subscription }: NavbarProps) {
+export function Navbar({ profile, subscription, hasCoachAccess, hasPlayerAccess }: NavbarProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
