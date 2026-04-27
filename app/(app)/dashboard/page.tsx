@@ -189,11 +189,16 @@ function ActivityRow({ log }: { log: AuditLog }) {
 
 function ManageBillingButton() {
   "use client";
+
+  async function handleClick() {
+    const res = await fetch("/api/stripe/create-portal", { method: "POST" });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  }
+
   return (
-    <form action="/api/stripe/create-portal" method="POST">
-      <Button type="submit" variant="secondary" size="sm">
-        Manage billing
-      </Button>
-    </form>
+    <Button type="button" variant="secondary" size="sm" onClick={handleClick}>
+      Manage billing
+    </Button>
   );
 }
