@@ -3,6 +3,36 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 import { createClient } from "@/lib/supabase/server";
 
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.stripe_customer_id) {
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing&error=no_customer`);
+    }
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing`,
+    });
+
+    return NextResponse.redirect(session.url);
+  } catch {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing&error=portal_error`);
+  }
+}
+
 export async function POST() {
   try {
     const supabase = await createClient();
