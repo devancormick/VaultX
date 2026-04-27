@@ -11,7 +11,7 @@ export default async function AssetsPage() {
 
   const [{ data: assets }, { data: subscription }] = await Promise.all([
     supabase.from("assets").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-    supabase.from("subscriptions").select("plan, status").eq("user_id", user.id).eq("status", "active").single(),
+    supabase.from("subscriptions").select("plan, status").eq("user_id", user.id).eq("status", "active").maybeSingle(),
   ]);
 
   const plan = subscription?.plan ?? "free";

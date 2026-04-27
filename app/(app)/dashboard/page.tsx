@@ -25,7 +25,7 @@ export default async function DashboardPage() {
     { data: playerMemberships },
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
-    supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single(),
+    supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("audit_log").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10),
     supabase.from("assets").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     supabase.from("viewer_sessions").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("revoked", false).gt("expires_at", new Date().toISOString()),
